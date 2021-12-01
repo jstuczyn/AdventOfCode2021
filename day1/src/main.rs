@@ -21,12 +21,13 @@ fn part1(input: &[usize]) -> usize {
 }
 
 fn part2(input: &[usize]) -> usize {
-    let window_sum = input
+    input
         .iter()
         .tuple_windows()
         .map(|(a, b, c)| a + b + c)
-        .collect::<Vec<_>>();
-    part1(&window_sum)
+        .tuple_windows()
+        .filter(|(a, b)| a < b)
+        .count()
 }
 
 fn main() {
