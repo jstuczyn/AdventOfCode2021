@@ -54,11 +54,16 @@ impl FromStr for Command {
 struct Submarine {
     x_pos: i64,
     y_pos: i64,
+    aim: i64,
 }
 
 impl Submarine {
     fn new() -> Submarine {
-        Submarine { x_pos: 0, y_pos: 0 }
+        Submarine {
+            x_pos: 0,
+            y_pos: 0,
+            aim: 0,
+        }
     }
 
     fn move_in_direction(&mut self, cmd: Command) {
@@ -66,6 +71,17 @@ impl Submarine {
             Command::Forward(magnitude) => self.x_pos += magnitude,
             Command::Down(magnitude) => self.y_pos += magnitude,
             Command::Up(magnitude) => self.y_pos -= magnitude,
+        }
+    }
+
+    fn steer_in_direction(&mut self, cmd: Command) {
+        match cmd {
+            Command::Forward(magnitude) => {
+                self.x_pos += magnitude;
+                self.y_pos += magnitude * self.aim
+            }
+            Command::Down(magnitude) => self.aim += magnitude,
+            Command::Up(magnitude) => self.aim -= magnitude,
         }
     }
 }
@@ -79,7 +95,11 @@ fn part1(input: &[Command]) -> i64 {
 }
 
 fn part2(input: &[Command]) -> i64 {
-    0
+    let mut sub = Submarine::new();
+    for &cmd in input {
+        sub.steer_in_direction(cmd)
+    }
+    sub.x_pos * sub.y_pos
 }
 
 fn main() {
@@ -120,5 +140,19 @@ mod tests {
         ];
         let expected = 150;
         assert_eq!(expected, part1(&input))
+    }
+
+    #[test]
+    fn part2_sample_input() {
+        let input = vec![
+            Command::Forward(5),
+            Command::Down(5),
+            Command::Forward(8),
+            Command::Up(3),
+            Command::Down(8),
+            Command::Forward(2),
+        ];
+        let expected = 900;
+        assert_eq!(expected, part2(&input))
     }
 }
