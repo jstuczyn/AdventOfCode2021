@@ -102,6 +102,7 @@ fn part2(input: &[Command]) -> i64 {
     sub.x_pos * sub.y_pos
 }
 
+#[cfg(not(tarpaulin))]
 fn main() {
     let input = input_read::read_line_input("input").expect("failed to read input file");
     let start = Instant::now();
