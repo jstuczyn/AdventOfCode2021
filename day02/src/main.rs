@@ -23,7 +23,7 @@ const UP_CMD: &str = "up";
 #[derive(Debug)]
 struct InvalidCommand;
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
 enum Command {
     Forward(i64),
     Down(i64),
@@ -155,5 +155,12 @@ mod tests {
         ];
         let expected = 900;
         assert_eq!(expected, part2(&input))
+    }
+
+    #[test]
+    fn command_parsing() {
+        assert_eq!(Command::Up(42), "up 42".parse().unwrap());
+        assert_eq!(Command::Down(123), "down 123".parse().unwrap());
+        assert_eq!(Command::Forward(1), "forward 1".parse().unwrap());
     }
 }
