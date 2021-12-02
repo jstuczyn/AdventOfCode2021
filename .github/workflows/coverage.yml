@@ -16,19 +16,16 @@ jobs:
           toolchain: stable
           override: true
 
-      - name: Run cargo-tarpaulin
-        uses: actions-rs/tarpaulin@v0.1
-        with:
-          version: '0.16.0'
-          args: '-- --test-threads 1'
+      - name: Install cargo-tarpaulin
+        run: |
+          cargo install cargo-tarpaulin
+
+      - name: Generate code coverage
+        run: |
+          cargo tarpaulin --verbose --all-features --workspace --timeout 120 --out Xml
 
       - name: Upload to codecov.io
         uses: codecov/codecov-action@v2
         with:
           token: ${{secrets.CODECOV_TOKEN}}
-
-      - name: Archive code coverage results
-        uses: actions/upload-artifact@v2
-        with:
-          name: code-coverage-report
-          path: cobertura.xml
+          fail_ci_if_error: true
