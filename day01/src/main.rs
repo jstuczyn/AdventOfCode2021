@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use itertools::Itertools;
-use utils::{execute_slice_with_timing, input_read};
+use utils::{execute, input_read};
 
 fn part1(input: &[usize]) -> usize {
     input.iter().tuple_windows().filter(|(a, b)| a < b).count()
@@ -32,18 +32,7 @@ fn part2(input: &[usize]) -> usize {
 #[cfg(not(tarpaulin))]
 fn main() {
     let input = input_read::read_line_input("input").expect("failed to read input file");
-    let (part1_result, part1_time_taken) = execute_slice_with_timing(part1, &input);
-    let (part2_result, part2_time_taken) = execute_slice_with_timing(part2, &input);
-
-    println!(
-        "Part 1 result is {}\nIt took {:?} to compute",
-        part1_result, part1_time_taken
-    );
-
-    println!(
-        "Part 2 result is {}\nIt took {:?} to compute",
-        part2_result, part2_time_taken
-    );
+    execute(&input, part1, part2)
 }
 
 #[cfg(test)]

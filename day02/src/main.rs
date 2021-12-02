@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use std::str::FromStr;
-use utils::{execute_slice_with_timing, input_read};
+use utils::{execute, input_read};
 
 const FORWARD_CMD: &str = "forward";
 const DOWN_CMD: &str = "down";
@@ -104,18 +104,7 @@ fn part2(input: &[Command]) -> i64 {
 #[cfg(not(tarpaulin))]
 fn main() {
     let input = input_read::read_line_input("input").expect("failed to read input file");
-    let (part1_result, part1_time_taken) = execute_slice_with_timing(part1, &input);
-    let (part2_result, part2_time_taken) = execute_slice_with_timing(part2, &input);
-
-    println!(
-        "Part 1 result is {}\nIt took {:?} to compute",
-        part1_result, part1_time_taken
-    );
-
-    println!(
-        "Part 2 result is {}\nIt took {:?} to compute",
-        part2_result, part2_time_taken
-    );
+    execute(&input, part1, part2)
 }
 
 #[cfg(test)]
