@@ -12,7 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub mod execution;
-pub mod input_read;
+use std::time::{Duration, Instant};
 
-pub use execution::execute_slice_with_timing;
+pub fn execute_slice_with_timing<F, T, U>(func: F, args: &[T]) -> (U, Duration)
+where
+    F: Fn(&[T]) -> U,
+{
+    let start = Instant::now();
+    let res = func(args);
+    let time_taken = Instant::now() - start;
+    (res, time_taken)
+}
