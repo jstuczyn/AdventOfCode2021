@@ -103,8 +103,7 @@ fn part2(input: &[Command]) -> i64 {
 
 #[cfg(not(tarpaulin))]
 fn main() {
-    let input = input_read::read_line_input("input").expect("failed to read input file");
-    execute(&input, part1, part2)
+    execute("input", input_read::read_line_input, part1, part2)
 }
 
 #[cfg(test)]
