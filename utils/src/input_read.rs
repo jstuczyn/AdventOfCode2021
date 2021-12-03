@@ -35,12 +35,7 @@ where
         .into_iter()
         .map(parser)
         .collect::<Result<Vec<T>, _>>()
-        .map_err(|err| {
-            io::Error::new(
-                io::ErrorKind::InvalidData,
-                format!("input could not be parsed into desired type - {:?}", err),
-            )
-        })
+        .map_err(|err| io::Error::new(io::ErrorKind::InvalidData, err))
 }
 
 /// Reads the file as lines, parsing each of them into desired type.
