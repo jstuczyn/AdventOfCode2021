@@ -103,7 +103,7 @@ fn part2(input: &[Command]) -> i64 {
 
 #[cfg(not(tarpaulin))]
 fn main() {
-    execute("input", input_read::read_line_input, part1, part2)
+    execute("input", input_read::read_parsed_line_input, part1, part2)
 }
 
 #[cfg(test)]

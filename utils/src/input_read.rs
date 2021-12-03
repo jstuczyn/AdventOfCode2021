@@ -18,32 +18,46 @@ use std::io::{self, BufRead};
 use std::path::Path;
 use std::str::FromStr;
 
+pub fn read_input_lines<P>(path: P) -> io::Result<Vec<String>>
+where
+    P: AsRef<Path>,
+{
+    let file = File::open(path)?;
+    io::BufReader::new(file).lines().collect()
+}
+
+pub fn read_input_lines_with_parser<T, F, P>(path: P, parser: F) -> io::Result<Vec<T>>
+where
+    P: AsRef<Path>,
+    F: Fn(String) -> io::Result<T>,
+{
+    read_input_lines(path)?
+        .into_iter()
+        .map(parser)
+        .collect::<Result<Vec<T>, _>>()
+        .map_err(|err| {
+            io::Error::new(
+                io::ErrorKind::InvalidData,
+                format!("input could not be parsed into desired type - {:?}", err),
+            )
+        })
+}
+
 /// Reads the file as lines, parsing each of them into desired type.
-pub fn read_line_input<T, P>(path: P) -> io::Result<Vec<T>>
+pub fn read_parsed_line_input<T, P>(path: P) -> io::Result<Vec<T>>
 where
     P: AsRef<Path>,
     T: FromStr,
     <T as FromStr>::Err: Debug,
 {
-    let file = File::open(path)?;
-
-    let lines = io::BufReader::new(file).lines();
-    let size_hint = lines.size_hint();
-
-    // use upper bound size hint if available, otherwise use lower bound
-    let mut results = Vec::with_capacity(size_hint.1.unwrap_or(size_hint.0));
-    for line in lines {
-        // the last one is technically not an io error, but I can't be bothered to create a separate error type just for this
-        results.push(line?.parse().map_err(|parse_err| {
+    read_input_lines(path)?
+        .into_iter()
+        .map(|line| line.parse::<T>())
+        .collect::<Result<Vec<T>, _>>()
+        .map_err(|err| {
             io::Error::new(
                 io::ErrorKind::InvalidData,
-                format!(
-                    "input could not be parsed into desired type - {:?}",
-                    parse_err
-                ),
+                format!("input could not be parsed into desired type - {:?}", err),
             )
-        })?)
-    }
-
-    Ok(results)
+        })
 }
