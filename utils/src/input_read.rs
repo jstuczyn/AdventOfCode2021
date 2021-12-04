@@ -60,6 +60,11 @@ where
 
 /// Reads the file and outputs String groups that were originally separated by an empty line
 pub fn read_into_string_groups<P: AsRef<Path>>(path: P) -> io::Result<Vec<String>> {
-    fs::read_to_string(path)
-        .map(|string| string.split("\n\n").map(|split| split.to_owned()).collect())
+    fs::read_to_string(path).map(|string| {
+        string
+            .replace("\r\n", "\n") // Windows fix
+            .split("\n\n")
+            .map(|split| split.to_owned())
+            .collect()
+    })
 }

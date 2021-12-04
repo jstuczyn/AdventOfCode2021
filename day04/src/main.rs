@@ -66,7 +66,7 @@ impl FromStr for BingoBoard {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let mut rows: [[BingoField; GRID_SIZE]; GRID_SIZE] = Default::default();
-        for (i, row) in s.split('\n').enumerate() {
+        for (i, row) in s.lines().enumerate() {
             for (j, val) in row.split_ascii_whitespace().enumerate() {
                 let val = val.parse().map_err(|_| MalformedBingoCard)?;
                 rows[i][j] = BingoField::new(val);
