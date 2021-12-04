@@ -31,9 +31,9 @@ struct BingoField {
 impl Display for BingoField {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         if self.marked {
-            write!(f, "[{:^2}]", self.value)
+            write!(f, "[{:>2}]", self.value)
         } else {
-            write!(f, " {:^2} ", self.value)
+            write!(f, " {:>2} ", self.value)
         }
     }
 }
