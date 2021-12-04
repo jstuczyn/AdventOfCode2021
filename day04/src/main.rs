@@ -178,6 +178,27 @@ impl BingoGame {
         None
     }
 
+    fn play_round_with_removal(&mut self, drawn: u8) -> Option<usize> {
+        let mut to_remove = Vec::new();
+        let boards = self.boards.len();
+        for (i, board) in self.boards.iter_mut().enumerate().rev() {
+            board.mark_value(drawn);
+            if board.check_win_condition() {
+                if boards == 1 {
+                    return Some(board.calculate_score() * drawn as usize);
+                } else {
+                    to_remove.push(i)
+                }
+            }
+        }
+
+        for remove in to_remove {
+            self.boards.remove(remove);
+        }
+
+        None
+    }
+
     fn draw_number(&mut self) -> u8 {
         let value = self
             .drawn_numbers
@@ -195,6 +216,15 @@ impl BingoGame {
             }
         }
     }
+
+    fn play_until_final_board(&mut self) -> usize {
+        loop {
+            let drawn = self.draw_number();
+            if let Some(winning_score) = self.play_round_with_removal(drawn) {
+                return winning_score;
+            }
+        }
+    }
 }
 
 fn part1(input: &[String]) -> usize {
@@ -203,7 +233,8 @@ fn part1(input: &[String]) -> usize {
 }
 
 fn part2(input: &[String]) -> usize {
-    0
+    let mut game = BingoGame::from_raw(input);
+    game.play_until_final_board()
 }
 
 #[cfg(not(tarpaulin))]
@@ -242,5 +273,34 @@ mod tests {
         let expected = 4512;
 
         assert_eq!(expected, part1(&input))
+    }
+
+    #[test]
+    fn part2_sample_input() {
+        let input = vec![
+            "7,4,9,5,11,17,23,2,0,14,21,24,10,16,13,6,15,25,12,22,18,20,8,19,3,26,1".to_string(),
+            r#"22 13 17 11  0
+8  2 23  4 24
+21  9 14 16  7
+6 10  3 18  5
+1 12 20 15 19"#
+                .to_string(),
+            r#"3 15  0  2 22
+9 18 13 17  5
+19  8  7 25 23
+20 11 10 24  4
+14 21 16 12  6"#
+                .to_string(),
+            r#"14 21 17 24  4
+10 16 15  9 19
+18  8 23 26 20
+22 11 13  6  5
+2  0 12  3  7"#
+                .to_string(),
+        ];
+
+        let expected = 1924;
+
+        assert_eq!(expected, part2(&input))
     }
 }
