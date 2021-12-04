@@ -13,6 +13,7 @@
 // limitations under the License.
 
 use std::fmt::Debug;
+use std::fs;
 use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
@@ -55,4 +56,10 @@ where
                 format!("input could not be parsed into desired type - {:?}", err),
             )
         })
+}
+
+/// Reads the file and outputs String groups that were originally separated by an empty line
+pub fn read_into_string_groups<P: AsRef<Path>>(path: P) -> io::Result<Vec<String>> {
+    fs::read_to_string(path)
+        .map(|string| string.split("\n\n").map(|split| split.to_owned()).collect())
 }
