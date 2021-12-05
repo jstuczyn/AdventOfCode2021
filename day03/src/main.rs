@@ -39,7 +39,7 @@ fn part1(input: &[String]) -> u32 {
     let mut gamma_rate = 0;
 
     for bit in 0..num_bits {
-        gamma_rate |= most_common_bit(&input, bit) << bit;
+        gamma_rate |= (most_common_bit(&input, bit) as u16) << bit;
     }
 
     let mask = (1 << num_bits) - 1;
