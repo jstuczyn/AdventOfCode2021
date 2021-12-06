@@ -23,14 +23,16 @@ fn naive_simulation(cycle_timers: &[usize], days: usize) -> usize {
     }
 
     for _ in 0..days {
-        let mut new_timers: [usize; 9] = Default::default();
-        new_timers[6] = timers[0];
-        new_timers[8] = timers[0];
-
-        for (timer_value, fish_count) in timers.iter().enumerate().skip(1) {
-            new_timers[timer_value - 1] += fish_count
-        }
-        timers = new_timers;
+        let t_0 = timers[0];
+        timers[0] = timers[1];
+        timers[1] = timers[2];
+        timers[2] = timers[3];
+        timers[3] = timers[4];
+        timers[4] = timers[5];
+        timers[5] = timers[6];
+        timers[6] = timers[7] + t_0;
+        timers[7] = timers[8];
+        timers[8] = t_0;
     }
 
     timers.iter().sum()
