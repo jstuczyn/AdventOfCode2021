@@ -22,7 +22,7 @@ fn naive_simulation(cycle_timers: &[usize], days: usize) -> usize {
         *timers.entry(*timer).or_default() += 1;
     }
 
-    for i in 0..days {
+    for _ in 0..days {
         let mut new_map = HashMap::new();
         for (timer_value, fish_count) in timers {
             if timer_value > 0 {
@@ -43,7 +43,7 @@ fn part1(input: &[usize]) -> usize {
 }
 
 fn part2(input: &[usize]) -> usize {
-    0
+    naive_simulation(input, 256)
 }
 
 #[cfg(not(tarpaulin))]
@@ -62,5 +62,14 @@ mod tests {
         let expected = 5934;
 
         assert_eq!(expected, part1(&input))
+    }
+
+    #[test]
+    fn part2_sample_input() {
+        let input = vec![3, 4, 3, 1, 2];
+
+        let expected = 26984457539;
+
+        assert_eq!(expected, part2(&input))
     }
 }
