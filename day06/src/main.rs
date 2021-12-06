@@ -17,13 +17,13 @@ use utils::execute;
 use utils::input_read::read_parsed_comma_separated_values;
 
 fn naive_simulation(cycle_timers: &[usize], days: usize) -> usize {
-    let mut timers = HashMap::new();
+    let mut timers = HashMap::with_capacity(cycle_timers.len());
     for timer in cycle_timers {
         *timers.entry(*timer).or_default() += 1;
     }
 
     for _ in 0..days {
-        let mut new_map = HashMap::new();
+        let mut new_map = HashMap::with_capacity(9);
         for (timer_value, fish_count) in timers {
             if timer_value > 0 {
                 *new_map.entry(timer_value - 1).or_default() += fish_count;
@@ -34,7 +34,6 @@ fn naive_simulation(cycle_timers: &[usize], days: usize) -> usize {
         }
         timers = new_map;
     }
-
     timers.values().sum()
 }
 
