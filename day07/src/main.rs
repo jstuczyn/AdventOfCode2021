@@ -12,22 +12,39 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use std::cmp::min;
 use utils::execute;
 use utils::input_read::read_parsed_comma_separated_values;
+
+fn abs_diff(a: usize, b: usize) -> usize {
+    (a as isize - b as isize).abs() as usize
+}
 
 fn part1(input: &[usize]) -> usize {
     let mut owned_input = input.to_vec();
     let idx = input.len() / 2;
     let (_, median, _) = owned_input.select_nth_unstable(idx);
 
-    input
-        .iter()
-        .map(|&x| (x as isize - *median as isize).abs() as usize)
-        .sum()
+    input.iter().map(|&x| abs_diff(x, *median)).sum()
 }
 
 fn part2(input: &[usize]) -> usize {
-    0
+    fn fuel_cost(from: usize, to: usize) -> usize {
+        (1..=abs_diff(from, to)).sum()
+    }
+
+    // so apparently we can't use just mean since its minimises distance^2
+    // and we need to minimise (distance * (distance + 1)) / 2.
+    // so rather than just doing a big binary search, just try 2 values closest
+    // to minimised d^2 and choose the smaller one
+    let sum: usize = input.iter().sum();
+    let mean_f = (sum as f32 / input.len() as f32).floor() as usize;
+    let mean_c = (sum as f32 / input.len() as f32).ceil() as usize;
+
+    let min_f = input.iter().map(|&x| fuel_cost(x, mean_f)).sum();
+    let min_c = input.iter().map(|&x| fuel_cost(x, mean_c)).sum();
+
+    min(min_f, min_c)
 }
 
 #[cfg(not(tarpaulin))]
@@ -49,5 +66,11 @@ mod tests {
     }
 
     #[test]
-    fn part2_sample_input() {}
+    fn part2_sample_input() {
+        let input = vec![16, 1, 2, 0, 4, 2, 7, 1, 2, 14];
+
+        let expected = 168;
+
+        assert_eq!(expected, part2(&input))
+    }
 }
