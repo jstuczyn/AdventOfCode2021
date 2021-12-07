@@ -68,3 +68,22 @@ pub fn read_into_string_groups<P: AsRef<Path>>(path: P) -> io::Result<Vec<String
             .collect()
     })
 }
+
+/// Reads the file as a string and parses comma-separated types
+pub fn read_parsed_comma_separated_values<T, P>(path: P) -> io::Result<Vec<T>>
+where
+    P: AsRef<Path>,
+    T: FromStr,
+    <T as FromStr>::Err: Debug,
+{
+    fs::read_to_string(path)?
+        .split(',')
+        .map(|split| split.parse())
+        .collect::<Result<Vec<T>, _>>()
+        .map_err(|err| {
+            io::Error::new(
+                io::ErrorKind::InvalidData,
+                format!("input could not be parsed into desired type - {:?}", err),
+            )
+        })
+}
