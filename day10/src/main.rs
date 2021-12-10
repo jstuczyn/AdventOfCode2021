@@ -15,6 +15,41 @@
 use utils::execute;
 use utils::input_read::read_input_lines;
 
+struct Stack<T> {
+    inner: Vec<T>,
+    size: usize,
+}
+
+impl<T> Stack<T> {
+    fn new() -> Self {
+        Stack {
+            inner: Vec::new(),
+            size: 0,
+        }
+    }
+
+    fn push(&mut self, value: T) {
+        self.inner.push(value)
+    }
+
+    fn pop(&mut self) -> Option<T> {
+        self.inner.pop()
+    }
+
+    fn is_empty(&self) -> bool {
+        self.inner.is_empty()
+    }
+}
+
+impl<T: Clone> Clone for Stack<T> {
+    fn clone(&self) -> Self {
+        Stack {
+            inner: self.inner.clone(),
+            size: self.size,
+        }
+    }
+}
+
 #[derive(Debug, Eq, PartialEq, Copy, Clone)]
 struct Bracket {
     typ: BracketType,
@@ -53,8 +88,12 @@ impl Bracket {
         }
     }
 
-    fn score(&self) -> usize {
-        self.typ.score()
+    fn error_score(&self) -> usize {
+        self.typ.error_score()
+    }
+
+    fn completion_score(&self) -> usize {
+        self.typ.completion_score()
     }
 }
 
@@ -67,12 +106,21 @@ enum BracketType {
 }
 
 impl BracketType {
-    fn score(&self) -> usize {
+    fn error_score(&self) -> usize {
         match self {
             BracketType::Parentheses => 3,
             BracketType::Square => 57,
             BracketType::Curly => 1197,
             BracketType::Angle => 25137,
+        }
+    }
+
+    fn completion_score(&self) -> usize {
+        match self {
+            BracketType::Parentheses => 1,
+            BracketType::Square => 2,
+            BracketType::Curly => 3,
+            BracketType::Angle => 4,
         }
     }
 }
@@ -90,14 +138,14 @@ impl LineError {
 }
 
 fn validate_line(line: &str) -> Result<(), LineError> {
-    let mut stack = Vec::new();
+    let mut stack = Stack::new();
 
     for bracket in line.chars().map(Bracket::from) {
         if bracket.is_opening() {
             stack.push(bracket)
         } else {
             let popped = match stack.pop() {
-                None => return Err(LineError::Incomplete),
+                None => return Err(LineError::Corrupted(bracket)),
                 Some(bracket) => bracket,
             };
             if popped.inverse() != bracket {
@@ -106,21 +154,67 @@ fn validate_line(line: &str) -> Result<(), LineError> {
         }
     }
 
-    Ok(())
+    if !stack.is_empty() {
+        Err(LineError::Incomplete)
+    } else {
+        Ok(())
+    }
+}
+
+fn complete_line(incomplete_line: &str) -> Vec<Bracket> {
+    let mut stack = Stack::new();
+
+    // first, fill up the stack with available characters
+    for bracket in incomplete_line.chars().map(Bracket::from) {
+        if bracket.is_opening() {
+            stack.push(bracket)
+        } else {
+            stack.pop();
+        }
+    }
+
+    let mut completion_brackets = Vec::new();
+
+    while let Some(popped) = stack.pop() {
+        completion_brackets.push(popped.inverse())
+    }
+
+    completion_brackets
+}
+
+fn calculate_completion_score(completion_brackets: Vec<Bracket>) -> usize {
+    let mut score = 0;
+
+    for bracket in completion_brackets {
+        score *= 5;
+        score += bracket.completion_score()
+    }
+
+    score
 }
 
 fn part1(input: &[String]) -> usize {
     input
         .iter()
         .map(|line| match validate_line(line) {
-            Err(LineError::Corrupted(bracket)) => bracket.score(),
+            Err(LineError::Corrupted(bracket)) => bracket.error_score(),
             _ => 0,
         })
         .sum()
 }
 
 fn part2(input: &[String]) -> usize {
-    0
+    let mut scores = input
+        .iter()
+        .filter(|line| match validate_line(line) {
+            Err(err) => err.is_incomplete(),
+            _ => false,
+        })
+        .map(|incomplete_line| calculate_completion_score(complete_line(incomplete_line)))
+        .collect::<Vec<_>>();
+
+    scores.sort_unstable();
+    scores[(scores.len() / 2)]
 }
 
 #[cfg(not(tarpaulin))]
@@ -150,5 +244,25 @@ mod tests {
         let expected = 26397;
 
         assert_eq!(expected, part1(&input))
+    }
+
+    #[test]
+    fn part2_sample_input() {
+        let input = vec![
+            "[({(<(())[]>[[{[]{<()<>>".to_string(),
+            "[(()[<>])]({[<{<<[]>>(".to_string(),
+            "{([(<{}[<>[]}>{[]{[(<()>".to_string(),
+            "(((({<>}<{<{<>}{[]{[]{}".to_string(),
+            "[[<[([]))<([[{}[[()]]]".to_string(),
+            "[{[{({}]{}}([{[{{{}}([]".to_string(),
+            "{<[[]]>}<{[{[{[]{()[[[]".to_string(),
+            "[<(<(<(<{}))><([]([]()".to_string(),
+            "<{([([[(<>()){}]>(<<{{".to_string(),
+            "<{([{{}}[<[[[<>{}]]]>[]]".to_string(),
+        ];
+
+        let expected = 288957;
+
+        assert_eq!(expected, part2(&input))
     }
 }
