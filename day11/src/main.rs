@@ -53,9 +53,6 @@ impl SquidGrid {
     }
 
     fn flash(&mut self, octopus: (usize, usize), flashed: &mut HashSet<(usize, usize)>) {
-        if flashed.contains(&octopus) {
-            return;
-        }
         flashed.insert(octopus);
 
         // (x - 1), (y - 1)
@@ -105,7 +102,9 @@ impl SquidGrid {
         let mut flashed = HashSet::new();
 
         for octopus in to_flash {
-            self.flash(octopus, &mut flashed);
+            if !flashed.contains(&octopus) {
+                self.flash(octopus, &mut flashed);
+            }
         }
 
         flashed
@@ -126,7 +125,6 @@ impl SquidGrid {
 
         // Then, any octopus with an energy level greater than 9 flashes.
         let flashed = self.flash_all(to_flash);
-
         let flashed_count = flashed.len();
 
         for (x, y) in flashed {
