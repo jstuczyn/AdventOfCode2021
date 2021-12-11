@@ -140,10 +140,19 @@ impl SquidGrid {
         let mut flashed = 0;
 
         for _ in 0..steps {
-            let step = self.simulate_step();
-            flashed += step;
+            flashed += self.simulate_step();
         }
         flashed
+    }
+
+    fn wait_for_sync(&mut self) -> usize {
+        let mut step = 0;
+        loop {
+            step += 1;
+            if self.simulate_step() == 100 {
+                return step;
+            }
+        }
     }
 }
 
@@ -152,7 +161,7 @@ fn part1(input: &[String]) -> usize {
 }
 
 fn part2(input: &[String]) -> usize {
-    0
+    SquidGrid::parse(input).wait_for_sync()
 }
 
 #[cfg(not(tarpaulin))]
@@ -182,5 +191,25 @@ mod tests {
         let expected = 1656;
 
         assert_eq!(expected, part1(&input))
+    }
+
+    #[test]
+    fn part2_sample_input() {
+        let input = vec![
+            "5483143223".to_string(),
+            "2745854711".to_string(),
+            "5264556173".to_string(),
+            "6141336146".to_string(),
+            "6357385478".to_string(),
+            "4167524645".to_string(),
+            "2176841721".to_string(),
+            "6882881134".to_string(),
+            "4846848554".to_string(),
+            "5283751526".to_string(),
+        ];
+
+        let expected = 195;
+
+        assert_eq!(expected, part2(&input))
     }
 }
