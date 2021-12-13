@@ -14,7 +14,7 @@
 
 use std::fmt::{Display, Formatter};
 use std::str::FromStr;
-use utils::execute;
+use utils::execute_slice;
 use utils::input_read::read_into_string_groups;
 
 const GRID_SIZE: usize = 5;
@@ -239,7 +239,7 @@ fn part2(input: &[String]) -> usize {
 
 #[cfg(not(tarpaulin))]
 fn main() {
-    execute("input", read_into_string_groups, part1, part2)
+    execute_slice("input", read_into_string_groups, part1, part2)
 }
 
 #[cfg(test)]

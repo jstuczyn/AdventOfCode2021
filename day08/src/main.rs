@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use std::collections::{HashMap, HashSet};
-use utils::execute;
+use utils::execute_slice;
 use utils::input_read::read_input_lines;
 
 fn split_into_pattern_and_display(raw: &str) -> (Vec<String>, Vec<String>) {
@@ -163,7 +163,7 @@ fn part2(input: &[String]) -> usize {
 
 #[cfg(not(tarpaulin))]
 fn main() {
-    execute("input", read_input_lines, part1, part2)
+    execute_slice("input", read_input_lines, part1, part2)
 }
 
 #[cfg(test)]

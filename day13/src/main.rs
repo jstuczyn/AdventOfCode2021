@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::collections::{HashSet, VecDeque};
+use std::collections::{BTreeSet, VecDeque};
 use std::str::FromStr;
-use utils::execute;
-use utils::input_read::read_into_string_groups;
+use utils::execution::execute_struct;
+use utils::input_read::read_parsed;
 
 #[derive(Debug)]
 struct MalformedFold;
@@ -23,7 +23,25 @@ struct MalformedFold;
 #[derive(Debug)]
 struct MalformedPoint;
 
-#[derive(Debug, Hash, Eq, PartialEq, Clone, Copy)]
+#[derive(Debug)]
+enum MalformedManual {
+    MalformedFold,
+    MalformedPoint,
+}
+
+impl From<MalformedFold> for MalformedManual {
+    fn from(_: MalformedFold) -> Self {
+        MalformedManual::MalformedFold
+    }
+}
+
+impl From<MalformedPoint> for MalformedManual {
+    fn from(_: MalformedPoint) -> Self {
+        MalformedManual::MalformedPoint
+    }
+}
+
+#[derive(Debug, Hash, Eq, PartialEq, Clone, Copy, Ord, PartialOrd)]
 struct Point {
     x: usize,
     y: usize,
@@ -48,13 +66,13 @@ impl FromStr for Point {
     }
 }
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Eq, PartialEq, Copy, Clone)]
 enum Axis {
     X,
     Y,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 struct Fold {
     axis: Axis,
     at: usize,
@@ -81,13 +99,31 @@ impl FromStr for Fold {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 struct Manual {
-    points: HashSet<Point>,
+    points: BTreeSet<Point>,
     folds: VecDeque<Fold>,
 }
 
+impl FromStr for Manual {
+    type Err = MalformedManual;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let lines = s
+            .replace("\r\n", "\n") // Windows fix
+            .split("\n\n")
+            .map(|split| split.to_owned())
+            .collect::<Vec<_>>();
+
+        let points = lines[0].lines().map(|s| s.parse().unwrap()).collect();
+        let folds = lines[1].lines().map(|s| s.parse().unwrap()).collect();
+
+        Ok(Manual { points, folds })
+    }
+}
+
 impl Manual {
+    #[cfg(test)]
     fn from_raw(raw: &[String]) -> Manual {
         let points = raw[0].lines().map(|s| s.parse().unwrap()).collect();
         let folds = raw[1].lines().map(|s| s.parse().unwrap()).collect();
@@ -96,7 +132,7 @@ impl Manual {
     }
 
     fn fold_at_y_axis(&mut self, at: usize) {
-        let mut new_points: HashSet<Point> = self
+        let mut new_points: BTreeSet<Point> = self
             .points
             .iter()
             .filter(|point| point.y < at)
@@ -115,7 +151,7 @@ impl Manual {
     }
 
     fn fold_at_x_axis(&mut self, at: usize) {
-        let mut new_points: HashSet<Point> = self
+        let mut new_points: BTreeSet<Point> = self
             .points
             .iter()
             .filter(|point| point.x < at)
@@ -165,21 +201,19 @@ impl Manual {
     }
 }
 
-fn part1(input: &[String]) -> String {
-    let mut manual = Manual::from_raw(input);
+fn part1(mut manual: Manual) -> usize {
     manual.fold();
-    manual.points.len().to_string()
+    manual.points.len()
 }
 
-fn part2(input: &[String]) -> String {
-    let mut manual = Manual::from_raw(input);
+fn part2(mut manual: Manual) -> String {
     while manual.fold() {}
     manual.final_manual()
 }
 
 #[cfg(not(tarpaulin))]
 fn main() {
-    execute("input", read_into_string_groups, part1, part2)
+    execute_struct("input", read_parsed, part1, part2)
 }
 
 #[cfg(test)]
@@ -213,9 +247,10 @@ fold along x=5"
                 .to_string(),
         ];
 
-        let expected = "17";
+        let manual = Manual::from_raw(&input);
+        let expected = 17;
 
-        assert_eq!(expected, part1(&input))
+        assert_eq!(expected, part1(manual))
     }
 
     #[test]
@@ -245,6 +280,7 @@ fold along x=5"
                 .to_string(),
         ];
 
+        let manual = Manual::from_raw(&input);
         let expected = r#"
 ■■■■■
 ■□□□■
@@ -252,6 +288,6 @@ fold along x=5"
 ■□□□■
 ■■■■■"#;
 
-        assert_eq!(expected, part2(&input))
+        assert_eq!(expected, part2(manual))
     }
 }

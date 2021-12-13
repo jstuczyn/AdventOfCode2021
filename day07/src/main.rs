@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use std::cmp::min;
-use utils::execute;
+use utils::execute_slice;
 use utils::input_read::read_parsed_comma_separated_values;
 
 fn abs_diff(a: usize, b: usize) -> usize {
@@ -49,7 +49,7 @@ fn part2(input: &[usize]) -> usize {
 
 #[cfg(not(tarpaulin))]
 fn main() {
-    execute("input", read_parsed_comma_separated_values, part1, part2)
+    execute_slice("input", read_parsed_comma_separated_values, part1, part2)
 }
 
 #[cfg(test)]

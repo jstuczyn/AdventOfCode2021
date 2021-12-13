@@ -15,7 +15,7 @@
 use std::collections::{HashMap, HashSet};
 use std::fmt::{Debug, Display, Formatter};
 use std::str::FromStr;
-use utils::execute;
+use utils::execute_slice;
 use utils::input_read::read_parsed_line_input;
 
 #[derive(Debug)]
@@ -124,7 +124,7 @@ fn part2(input: &[Edge]) -> usize {
 
 #[cfg(not(tarpaulin))]
 fn main() {
-    execute("input", read_parsed_line_input, part1, part2)
+    execute_slice("input", read_parsed_line_input, part1, part2)
 }
 
 #[cfg(test)]
