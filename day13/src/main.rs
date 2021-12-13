@@ -190,9 +190,9 @@ impl Manual {
             let mut row = Vec::with_capacity(max_x);
             for x in 0..=max_x {
                 if self.points.contains(&Point { x, y }) {
-                    row.push('■');
+                    row.push('█');
                 } else {
-                    row.push('□')
+                    row.push('⠀')
                 }
             }
             out.push(row.into_iter().collect::<String>())
@@ -282,11 +282,11 @@ fold along x=5"
 
         let manual = Manual::from_raw(&input);
         let expected = r#"
-■■■■■
-■□□□■
-■□□□■
-■□□□■
-■■■■■"#;
+█████
+█⠀⠀⠀█
+█⠀⠀⠀█
+█⠀⠀⠀█
+█████"#;
 
         assert_eq!(expected, part2(manual))
     }
