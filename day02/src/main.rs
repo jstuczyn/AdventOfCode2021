@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use std::str::FromStr;
-use utils::{execute, input_read};
+use utils::{execute_slice, input_read};
 
 const FORWARD_CMD: &str = "forward";
 const DOWN_CMD: &str = "down";
@@ -103,7 +103,7 @@ fn part2(input: &[Command]) -> i64 {
 
 #[cfg(not(tarpaulin))]
 fn main() {
-    execute("input", input_read::read_parsed_line_input, part1, part2)
+    execute_slice("input", input_read::read_parsed_line_input, part1, part2)
 }
 
 #[cfg(test)]

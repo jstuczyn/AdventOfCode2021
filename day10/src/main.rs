@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use utils::execute;
+use utils::execute_slice;
 use utils::input_read::read_input_lines;
 
 struct Stack<T> {
@@ -219,7 +219,7 @@ fn part2(input: &[String]) -> usize {
 
 #[cfg(not(tarpaulin))]
 fn main() {
-    execute("input", read_input_lines, part1, part2)
+    execute_slice("input", read_input_lines, part1, part2)
 }
 
 #[cfg(test)]

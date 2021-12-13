@@ -15,4 +15,4 @@
 pub mod execution;
 pub mod input_read;
 
-pub use execution::execute;
+pub use execution::execute_slice;

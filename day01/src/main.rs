@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use itertools::Itertools;
-use utils::{execute, input_read};
+use utils::{execute_slice, input_read};
 
 fn part1(input: &[usize]) -> usize {
     input.iter().tuple_windows().filter(|(a, b)| a < b).count()
@@ -31,7 +31,7 @@ fn part2(input: &[usize]) -> usize {
 
 #[cfg(not(tarpaulin))]
 fn main() {
-    execute("input", input_read::read_parsed_line_input, part1, part2)
+    execute_slice("input", input_read::read_parsed_line_input, part1, part2)
 }
 
 #[cfg(test)]

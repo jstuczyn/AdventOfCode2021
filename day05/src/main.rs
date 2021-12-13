@@ -15,7 +15,7 @@
 use std::collections::HashMap;
 use std::fmt::{Display, Formatter};
 use std::str::FromStr;
-use utils::execute;
+use utils::execute_slice;
 use utils::input_read::read_parsed_line_input;
 
 #[derive(Debug)]
@@ -158,7 +158,7 @@ fn part2(input: &[VentLine]) -> usize {
 
 #[cfg(not(tarpaulin))]
 fn main() {
-    execute("input", read_parsed_line_input, part1, part2)
+    execute_slice("input", read_parsed_line_input, part1, part2)
 }
 
 #[cfg(test)]

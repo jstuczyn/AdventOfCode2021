@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use utils::execute;
+use utils::execute_slice;
 use utils::input_read::read_parsed_comma_separated_values;
 
 fn naive_simulation(cycle_timers: &[usize], days: usize) -> usize {
@@ -47,7 +47,7 @@ fn part2(input: &[usize]) -> usize {
 
 #[cfg(not(tarpaulin))]
 fn main() {
-    execute("input", read_parsed_comma_separated_values, part1, part2)
+    execute_slice("input", read_parsed_comma_separated_values, part1, part2)
 }
 
 #[cfg(test)]
