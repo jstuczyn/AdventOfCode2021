@@ -149,7 +149,7 @@ impl Manual {
     fn final_manual(&self) -> String {
         let max_x = self.points.iter().max_by_key(|point| point.x).unwrap().x;
         let max_y = self.points.iter().max_by_key(|point| point.y).unwrap().y;
-        let mut out = Vec::with_capacity(max_y);
+        let mut out = vec![String::new()];
         for y in 0..=max_y {
             let mut row = Vec::with_capacity(max_x);
             for x in 0..=max_x {
@@ -165,14 +165,16 @@ impl Manual {
     }
 }
 
-fn part1(input: &[String]) -> usize {
+fn part1(input: &[String]) -> String {
     let mut manual = Manual::from_raw(input);
     manual.fold();
-    manual.points.len()
+    manual.points.len().to_string()
 }
 
-fn part2(input: &[String]) -> usize {
-    0
+fn part2(input: &[String]) -> String {
+    let mut manual = Manual::from_raw(input);
+    while manual.fold() {}
+    manual.final_manual()
 }
 
 #[cfg(not(tarpaulin))]
@@ -211,8 +213,45 @@ fold along x=5"
                 .to_string(),
         ];
 
-        let expected = 18;
+        let expected = "17";
 
         assert_eq!(expected, part1(&input))
+    }
+
+    #[test]
+    fn part2_sample_input() {
+        let input = vec![
+            "6,10
+0,14
+9,10
+0,3
+10,4
+4,11
+6,0
+6,12
+4,1
+0,13
+10,12
+3,4
+3,0
+8,4
+1,10
+2,14
+8,10
+9,0"
+            .to_string(),
+            "fold along y=7
+fold along x=5"
+                .to_string(),
+        ];
+
+        let expected = r#"
+■■■■■
+■□□□■
+■□□□■
+■□□□■
+■■■■■"#;
+
+        assert_eq!(expected, part2(&input))
     }
 }
