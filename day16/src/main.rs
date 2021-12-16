@@ -21,7 +21,14 @@ use utils::input_read::read_parsed;
 #[derive(Debug)]
 struct MalformedPacket;
 
-const LITERAL_VAL_ID: u64 = 4;
+const SUM_TYPE_ID: u64 = 0;
+const PRODUCT_TYPE_ID: u64 = 1;
+const MIN_TYPE_ID: u64 = 2;
+const MAX_TYPE_ID: u64 = 3;
+const LITERAL_VAL_TYPE_ID: u64 = 4;
+const GREATER_THAN_TYPE_ID: u64 = 5;
+const LESS_THAN_TYPE_ID: u64 = 6;
+const EQUAL_TYPE_ID: u64 = 7;
 
 fn bits_to_u64(bits: &BitSlice<u8, Msb0>) -> u64 {
     let mut res = 0u64;
@@ -31,16 +38,35 @@ fn bits_to_u64(bits: &BitSlice<u8, Msb0>) -> u64 {
 
 #[derive(Debug, Clone, Eq, PartialEq, Copy)]
 enum Type {
+    Sum,
+    Product,
+    Min,
+    Max,
     Literal,
-    Operator(u64),
+    GreaterThan,
+    LessThan,
+    Equal,
 }
 
 impl From<u64> for Type {
     fn from(val: u64) -> Self {
         match val {
-            n if n == LITERAL_VAL_ID => Type::Literal,
-            n => Type::Operator(n),
+            n if n == SUM_TYPE_ID => Type::Sum,
+            n if n == PRODUCT_TYPE_ID => Type::Product,
+            n if n == MIN_TYPE_ID => Type::Min,
+            n if n == MAX_TYPE_ID => Type::Max,
+            n if n == LITERAL_VAL_TYPE_ID => Type::Literal,
+            n if n == GREATER_THAN_TYPE_ID => Type::GreaterThan,
+            n if n == LESS_THAN_TYPE_ID => Type::LessThan,
+            n if n == EQUAL_TYPE_ID => Type::Equal,
+            _ => unreachable!(),
         }
+    }
+}
+
+impl Type {
+    fn is_literal(&self) -> bool {
+        matches!(self, Type::Literal)
     }
 }
 
@@ -121,7 +147,7 @@ impl Content {
     }
 
     fn from_bits(bits: &BitSlice<u8, Msb0>, typ: Type) -> (Self, usize) {
-        if typ == Type::Literal {
+        if typ.is_literal() {
             Self::parse_literal_value(bits)
         } else {
             let length_type_id = bits[0];
@@ -131,6 +157,22 @@ impl Content {
             } else {
                 let (content, used_bytes) = Self::parse_operator_length_type_0(&bits[1..]);
                 (content, used_bytes + 1)
+            }
+        }
+    }
+
+    fn compute<F>(&self, func: F) -> usize
+    where
+        F: FnOnce(&[usize]) -> usize,
+    {
+        match self {
+            Content::Literal(val) => *val as usize,
+            Content::Operator(packets) => {
+                let sub_results = packets
+                    .iter()
+                    .map(|packet| packet.calculate())
+                    .collect::<Vec<_>>();
+                func(&sub_results)
             }
         }
     }
@@ -153,6 +195,25 @@ impl Packet {
                         .map(|packet| packet.version_sum())
                         .sum::<usize>()
             }
+        }
+    }
+
+    fn calculate(&self) -> usize {
+        match self.header.type_id {
+            Type::Sum => self.content.compute(|vals| vals.iter().sum()),
+            Type::Product => self.content.compute(|vals| vals.iter().product()),
+            Type::Min => self.content.compute(|vals| *vals.iter().min().unwrap()),
+            Type::Max => self.content.compute(|vals| *vals.iter().max().unwrap()),
+            Type::Literal => self.content.compute(|_| Default::default()),
+            Type::GreaterThan => self
+                .content
+                .compute(|vals| if vals[0] > vals[1] { 1 } else { 0 }),
+            Type::LessThan => self
+                .content
+                .compute(|vals| if vals[0] < vals[1] { 1 } else { 0 }),
+            Type::Equal => self
+                .content
+                .compute(|vals| if vals[0] == vals[1] { 1 } else { 0 }),
         }
     }
 }
@@ -182,8 +243,8 @@ fn part1(packet: Packet) -> usize {
     packet.version_sum()
 }
 
-fn part2(_packet: Packet) -> usize {
-    0
+fn part2(packet: Packet) -> usize {
+    packet.calculate()
 }
 
 #[cfg(not(tarpaulin))]
@@ -215,7 +276,7 @@ mod tests {
         let expected = Packet {
             header: Header {
                 version: 1,
-                type_id: Type::Operator(6),
+                type_id: Type::LessThan,
             },
             content: Content::Operator(vec![
                 Packet {
@@ -244,7 +305,7 @@ mod tests {
         let expected = Packet {
             header: Header {
                 version: 7,
-                type_id: Type::Operator(3),
+                type_id: Type::Max,
             },
             content: Content::Operator(vec![
                 Packet {
@@ -304,5 +365,69 @@ mod tests {
         let expected = 31;
 
         assert_eq!(expected, part1(packet));
+    }
+
+    #[test]
+    fn part2_sample_input_1() {
+        let packet = "C200B40A82".parse().unwrap();
+        let expected = 3;
+
+        assert_eq!(expected, part2(packet));
+    }
+
+    #[test]
+    fn part2_sample_input_2() {
+        let packet = "04005AC33890".parse().unwrap();
+        let expected = 54;
+
+        assert_eq!(expected, part2(packet));
+    }
+
+    #[test]
+    fn part2_sample_input_3() {
+        let packet = "880086C3E88112".parse().unwrap();
+        let expected = 7;
+
+        assert_eq!(expected, part2(packet));
+    }
+
+    #[test]
+    fn part2_sample_input_4() {
+        let packet = "CE00C43D881120".parse().unwrap();
+        let expected = 9;
+
+        assert_eq!(expected, part2(packet));
+    }
+
+    #[test]
+    fn part2_sample_input_5() {
+        let packet = "D8005AC2A8F0".parse().unwrap();
+        let expected = 1;
+
+        assert_eq!(expected, part2(packet));
+    }
+
+    #[test]
+    fn part2_sample_input_6() {
+        let packet = "F600BC2D8F".parse().unwrap();
+        let expected = 0;
+
+        assert_eq!(expected, part2(packet));
+    }
+
+    #[test]
+    fn part2_sample_input_7() {
+        let packet = "9C005AC2F8F0".parse().unwrap();
+        let expected = 0;
+
+        assert_eq!(expected, part2(packet));
+    }
+
+    #[test]
+    fn part2_sample_input_8() {
+        let packet = "9C0141080250320F1802104A08".parse().unwrap();
+        let expected = 1;
+
+        assert_eq!(expected, part2(packet));
     }
 }
