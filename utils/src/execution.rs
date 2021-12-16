@@ -23,7 +23,7 @@ where
 {
     let start = Instant::now();
     let res = func(args);
-    let time_taken = Instant::now() - start;
+    let time_taken = start.elapsed();
     (res, time_taken)
 }
 
@@ -33,7 +33,7 @@ where
 {
     let start = Instant::now();
     let res = func(args);
-    let time_taken = Instant::now() - start;
+    let time_taken = start.elapsed();
     (res, time_taken)
 }
 
