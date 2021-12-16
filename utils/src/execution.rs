@@ -23,7 +23,7 @@ where
 {
     let start = Instant::now();
     let res = func(args);
-    let time_taken = Instant::now() - start;
+    let time_taken = start.elapsed();
     (res, time_taken)
 }
 
@@ -33,7 +33,7 @@ where
 {
     let start = Instant::now();
     let res = func(args);
-    let time_taken = Instant::now() - start;
+    let time_taken = start.elapsed();
     (res, time_taken)
 }
 
@@ -47,15 +47,20 @@ where
     U: Display,
     S: Display,
 {
+    let parsing_start = Instant::now();
     let input = input_parser(input_file).expect("failed to read input file");
+    let parsing_time_taken = parsing_start.elapsed();
+
     let (part1_result, part1_time_taken) = execute_slice_with_timing(part1_fn, &input);
     let (part2_result, part2_time_taken) = execute_slice_with_timing(part2_fn, &input);
 
+    println!("It took {:?} to parse the input", parsing_time_taken);
+    println!();
     println!(
         "Part 1 result is {}\nIt took {:?} to compute",
         part1_result, part1_time_taken
     );
-
+    println!();
     println!(
         "Part 2 result is {}\nIt took {:?} to compute",
         part2_result, part2_time_taken
@@ -72,15 +77,20 @@ where
     S: Display,
     T: Clone,
 {
+    let parsing_start = Instant::now();
     let input = input_parser(input_file).expect("failed to read input file");
+    let parsing_time_taken = parsing_start.elapsed();
+
     let (part1_result, part1_time_taken) = execute_struct_with_timing(part1_fn, input.clone());
     let (part2_result, part2_time_taken) = execute_struct_with_timing(part2_fn, input);
 
+    println!("It took {:?} to parse the input", parsing_time_taken);
+    println!();
     println!(
         "Part 1 result is {}\nIt took {:?} to compute",
         part1_result, part1_time_taken
     );
-
+    println!();
     println!(
         "Part 2 result is {}\nIt took {:?} to compute",
         part2_result, part2_time_taken
