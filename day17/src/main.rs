@@ -92,12 +92,59 @@ impl Target {
     }
 }
 
+struct Velocity {
+    dx: isize,
+    dy: isize,
+}
+
+impl Velocity {
+    #[allow(clippy::comparison_chain)]
+    fn step(&mut self) {
+        self.dy -= 1;
+
+        if self.dx > 0 {
+            self.dx -= 1
+        } else if self.dx < 0 {
+            self.dx += 1
+        }
+    }
+
+    fn move_probe(&self, probe: &mut (isize, isize)) {
+        probe.0 += self.dx;
+        probe.1 += self.dy;
+    }
+}
+
 fn part1(target: Target) -> usize {
     target.maximise_altitude()
 }
 
 fn part2(target: Target) -> usize {
-    0
+    // unfortunately I'm running out of time now, so we're left to bruteforcing here : (
+    let mut valid_velocities = 0;
+    for dx in 0..*target.x_range.end() * 2 {
+        for dy in *target.y_range.start()..target.y_range.start().abs() {
+            let mut v = Velocity { dx, dy };
+            let mut probe = (0, 0);
+            loop {
+                if target.x_range.contains(&probe.0) && target.y_range.contains(&probe.1) {
+                    valid_velocities += 1;
+                    break;
+                }
+                if probe.0 > *target.x_range.end() {
+                    break;
+                }
+                if probe.1 < *target.y_range.start() {
+                    break;
+                }
+
+                v.move_probe(&mut probe);
+                v.step();
+            }
+        }
+    }
+
+    valid_velocities
 }
 
 #[cfg(not(tarpaulin))]
@@ -115,5 +162,13 @@ mod tests {
 
         let expected = 45;
         assert_eq!(expected, part1(target))
+    }
+
+    #[test]
+    fn part2_sample_input() {
+        let target = "target area: x=20..30, y=-10..-5".parse().unwrap();
+
+        let expected = 112;
+        assert_eq!(expected, part2(target))
     }
 }
