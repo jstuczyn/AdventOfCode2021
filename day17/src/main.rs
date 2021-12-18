@@ -28,7 +28,7 @@ struct Target {
 }
 
 fn parse_raw_range(raw: &str) -> Result<RangeInclusive<isize>, MalformedTarget> {
-    let mut bounds = raw.split("=");
+    let mut bounds = raw.split('=');
     let _axis = bounds.next().ok_or(MalformedTarget)?;
     let mut values = bounds.next().ok_or(MalformedTarget)?.split("..");
 
