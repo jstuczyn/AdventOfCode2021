@@ -13,6 +13,7 @@
 // limitations under the License.
 
 use pathfinding::prelude::dijkstra;
+use std::fmt::{Display, Formatter};
 use std::ops::Index;
 use std::str::FromStr;
 use utils::execution::execute_struct;
@@ -84,14 +85,58 @@ impl RiskLevelMap {
 
         successors
     }
+
+    fn map_value(i: usize, val: usize) -> usize {
+        if i == 0 {
+            val
+        } else {
+            let res = val + i;
+            if res > 9 {
+                res - 9
+            } else {
+                res
+            }
+        }
+    }
+
+    fn expand_row_five_folds(&mut self, row: usize) {
+        let old = std::mem::take(&mut self.rows[row]);
+        self.rows[row] = std::iter::repeat(old)
+            .take(5)
+            .enumerate()
+            .flat_map(|(i, vals)| vals.into_iter().map(move |v| Self::map_value(i, v)))
+            .collect::<Vec<_>>();
+    }
+
+    fn expand_columns_five_folds(&mut self) {
+        let rows = self.rows.clone();
+        for i in 1..=4 {
+            for row in rows.clone() {
+                let new_row = row
+                    .clone()
+                    .into_iter()
+                    .map(|v| Self::map_value(i, v))
+                    .collect();
+                self.rows.push(new_row);
+            }
+        }
+    }
+
+    fn expand_five_folds(&mut self) {
+        for i in 0..self.rows.len() {
+            self.expand_row_five_folds(i)
+        }
+        self.expand_columns_five_folds()
+    }
 }
 
 fn part1(risk_map: RiskLevelMap) -> usize {
     risk_map.lowest_risk_path_cost()
 }
 
-fn part2(risk_map: RiskLevelMap) -> usize {
-    0
+fn part2(mut risk_map: RiskLevelMap) -> usize {
+    risk_map.expand_five_folds();
+    risk_map.lowest_risk_path_cost()
 }
 
 #[cfg(not(tarpaulin))]
@@ -120,5 +165,24 @@ mod tests {
 
         let expected = 40;
         assert_eq!(expected, part1(input))
+    }
+
+    #[test]
+    fn part2_sample_input() {
+        let input = "1163751742
+1381373672
+2136511328
+3694931569
+7463417111
+1319128137
+1359912421
+3125421639
+1293138521
+2311944581"
+            .parse()
+            .unwrap();
+
+        let expected = 315;
+        assert_eq!(expected, part2(input))
     }
 }
