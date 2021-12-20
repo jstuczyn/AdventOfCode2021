@@ -64,7 +64,32 @@ impl NumberTree {
 
     fn explode_pair(&mut self, height: usize, branch: usize) {
         debug_assert_eq!(self.heights[height][branch], Some(Number::Pair));
-        self.heights[height][branch] = Some(Number::Regular(0))
+        debug_assert!(matches!(
+            self.heights[height + 1][branch * 2],
+            Some(Number::Regular(_))
+        ));
+        debug_assert!(matches!(
+            self.heights[height + 1][branch * 2 + 1],
+            Some(Number::Regular(_))
+        ));
+        self.heights[height][branch] = Some(Number::Regular(0));
+
+        let left_val = self.heights[height + 1][branch * 2]
+            .take()
+            .unwrap()
+            .must_get_regular();
+        let right_val = self.heights[height + 1][branch * 2 + 1]
+            .take()
+            .unwrap()
+            .must_get_regular();
+
+        self.add_left_of(height, branch, left_val);
+        self.add_right_of(height, branch, right_val);
+
+        // cleanup
+        if self.heights[5].iter().all(|val| val.is_none()) {
+            self.heights.remove(5);
+        }
     }
 
     fn split_value(&mut self, height: usize, branch: usize) {
@@ -86,15 +111,19 @@ impl NumberTree {
         self.insert_num_node(height + 1, branch * 2 + 1, y);
     }
 
-    fn magnitude(&self, height: usize, branch: usize) -> u32 {
+    fn _magnitude(&self, height: usize, branch: usize) -> u32 {
         match self.heights[height][branch] {
             Some(Number::Regular(val)) => val,
             Some(Number::Pair) => {
-                3 * self.magnitude(height + 1, branch * 2)
-                    + 2 * self.magnitude(height + 1, branch * 2 + 1)
+                3 * self._magnitude(height + 1, branch * 2)
+                    + 2 * self._magnitude(height + 1, branch * 2 + 1)
             }
             None => unreachable!(),
         }
+    }
+
+    fn magnitude(&self) -> u32 {
+        self._magnitude(0, 0)
     }
 
     fn add_left_of(&mut self, this_height: usize, this_branch: usize, val: u32) {
@@ -125,7 +154,7 @@ impl NumberTree {
 
     fn explode(&mut self) -> bool {
         let mut to_explode = None;
-        // values to explode will only ever exist on height 5
+        // values whose parents have to explode will only ever exist on height 5
         match self.heights.get_mut(5) {
             None => return false,
             Some(vals) => {
@@ -138,20 +167,9 @@ impl NumberTree {
             }
         }
 
-        if let Some(branch_1) = to_explode {
-            let left_val = self.heights[5][branch_1].take().unwrap().must_get_regular();
-            let right_val = self.heights[5][branch_1 + 1]
-                .take()
-                .unwrap()
-                .must_get_regular();
-
-            self.explode_pair(4, branch_1 / 2);
-            self.add_left_of(4, branch_1 / 2, left_val);
-            self.add_right_of(4, branch_1 / 2, right_val);
-
-            if self.heights[5].iter().all(|val| val.is_none()) {
-                self.heights.remove(5);
-            }
+        if let Some(exploding_branch) = to_explode {
+            // we explode the parent
+            self.explode_pair(4, exploding_branch / 2);
             true
         } else {
             false
@@ -287,7 +305,7 @@ fn part1(numbers: &[NumberTree]) -> u32 {
     for num in numbers.iter().skip(1) {
         acc = acc + num;
     }
-    acc.magnitude(0, 0)
+    acc.magnitude()
 }
 
 fn part2(numbers: &[NumberTree]) -> u32 {
@@ -298,8 +316,8 @@ fn part2(numbers: &[NumberTree]) -> u32 {
         .permutations(2)
         .map(|nums| {
             max(
-                (nums[0].clone() + &nums[1].clone()).magnitude(0, 0),
-                (nums[1].clone() + &nums[0].clone()).magnitude(0, 0),
+                (nums[0].clone() + &nums[1].clone()).magnitude(),
+                (nums[1].clone() + &nums[0].clone()).magnitude(),
             )
         })
         .max()
@@ -393,29 +411,29 @@ mod tests {
     fn magnitude() {
         let tree: NumberTree = "[[1,2],[[3,4],5]]".parse().unwrap();
         let expected = 143;
-        assert_eq!(tree.magnitude(0, 0), expected);
+        assert_eq!(tree.magnitude(), expected);
 
         let tree: NumberTree = "[[[[0,7],4],[[7,8],[6,0]]],[8,1]]".parse().unwrap();
         let expected = 1384;
-        assert_eq!(tree.magnitude(0, 0), expected);
+        assert_eq!(tree.magnitude(), expected);
 
         let tree: NumberTree = "[[[[1,1],[2,2]],[3,3]],[4,4]]".parse().unwrap();
         let expected = 445;
-        assert_eq!(tree.magnitude(0, 0), expected);
+        assert_eq!(tree.magnitude(), expected);
 
         let tree: NumberTree = "[[[[3,0],[5,3]],[4,4]],[5,5]]".parse().unwrap();
         let expected = 791;
-        assert_eq!(tree.magnitude(0, 0), expected);
+        assert_eq!(tree.magnitude(), expected);
 
         let tree: NumberTree = "[[[[5,0],[7,4]],[5,5]],[6,6]]".parse().unwrap();
         let expected = 1137;
-        assert_eq!(tree.magnitude(0, 0), expected);
+        assert_eq!(tree.magnitude(), expected);
 
         let tree: NumberTree = "[[[[8,7],[7,7]],[[8,6],[7,7]]],[[[0,7],[6,6]],[8,7]]]"
             .parse()
             .unwrap();
         let expected = 3488;
-        assert_eq!(tree.magnitude(0, 0), expected);
+        assert_eq!(tree.magnitude(), expected);
     }
 
     #[test]
