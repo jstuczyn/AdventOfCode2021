@@ -13,7 +13,6 @@
 // limitations under the License.
 
 use pathfinding::prelude::dijkstra;
-use std::fmt::{Display, Formatter};
 use std::ops::Index;
 use std::str::FromStr;
 use utils::execution::execute_struct;
