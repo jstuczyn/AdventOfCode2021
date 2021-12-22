@@ -14,5 +14,6 @@
 
 pub mod execution;
 pub mod input_read;
+pub mod parsing;
 
 pub use execution::execute_slice;
