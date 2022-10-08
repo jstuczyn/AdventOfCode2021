@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::alu::Operand;
+use crate::alu::{Operand, Variable};
 use anyhow::{anyhow, bail};
 use std::fmt::{Display, Formatter};
 use std::str::FromStr;
@@ -24,14 +24,14 @@ const DIV: &str = "div";
 const MOD: &str = "mod";
 const EQUAL: &str = "eql";
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub(crate) enum Instruction {
-    Input(Operand),
-    Add(Operand, Operand),
-    Mul(Operand, Operand),
-    Div(Operand, Operand),
-    Mod(Operand, Operand),
-    Equal(Operand, Operand),
+    Input(Variable),
+    Add(Variable, Operand),
+    Mul(Variable, Operand),
+    Div(Variable, Operand),
+    Mod(Variable, Operand),
+    Equal(Variable, Operand),
 }
 
 impl FromStr for Instruction {

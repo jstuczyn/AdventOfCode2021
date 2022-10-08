@@ -16,49 +16,49 @@ use anyhow::bail;
 use std::fmt::{Display, Formatter};
 use std::str::FromStr;
 
-#[derive(Debug)]
-pub(crate) enum Var {
+#[derive(Debug, Copy, Clone)]
+pub(crate) enum Variable {
     W,
     X,
     Y,
     Z,
 }
 
-impl FromStr for Var {
+impl FromStr for Variable {
     type Err = anyhow::Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
-            x if x == "w" => Ok(Var::W),
-            x if x == "x" => Ok(Var::X),
-            x if x == "y" => Ok(Var::Y),
-            x if x == "z" => Ok(Var::Z),
+            x if x == "w" => Ok(Variable::W),
+            x if x == "x" => Ok(Variable::X),
+            x if x == "y" => Ok(Variable::Y),
+            x if x == "z" => Ok(Variable::Z),
             _ => bail!("not a valid variable"),
         }
     }
 }
 
-impl Display for Var {
+impl Display for Variable {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            Var::W => write!(f, "w"),
-            Var::X => write!(f, "x"),
-            Var::Y => write!(f, "y"),
-            Var::Z => write!(f, "z"),
+            Variable::W => write!(f, "w"),
+            Variable::X => write!(f, "x"),
+            Variable::Y => write!(f, "y"),
+            Variable::Z => write!(f, "z"),
         }
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub(crate) enum Operand {
-    Variable(Var),
+    Var(Variable),
     Number(isize),
 }
 
 impl Display for Operand {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            Operand::Variable(var) => var.fmt(f),
+            Operand::Var(var) => var.fmt(f),
             Operand::Number(num) => num.fmt(f),
         }
     }
@@ -69,8 +69,8 @@ impl FromStr for Operand {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         // try to parse it as a variable, otherwise fallback to a number
-        if let Ok(var) = Var::from_str(s) {
-            Ok(Operand::Variable(var))
+        if let Ok(var) = Variable::from_str(s) {
+            Ok(Operand::Var(var))
         } else {
             Ok(Operand::Number(s.parse()?))
         }
