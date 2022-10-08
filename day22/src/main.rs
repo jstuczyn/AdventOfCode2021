@@ -103,9 +103,9 @@ impl Cuboid {
     }
 
     fn size(&self) -> usize {
-        let x_size = (self.x_range.end() - self.x_range.start()).abs() as usize + 1;
-        let y_size = (self.y_range.end() - self.y_range.start()).abs() as usize + 1;
-        let z_size = (self.z_range.end() - self.z_range.start()).abs() as usize + 1;
+        let x_size = (self.x_range.end() - self.x_range.start()).unsigned_abs() + 1;
+        let y_size = (self.y_range.end() - self.y_range.start()).unsigned_abs() + 1;
+        let z_size = (self.z_range.end() - self.z_range.start()).unsigned_abs() + 1;
 
         x_size * y_size * z_size
     }
