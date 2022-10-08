@@ -17,6 +17,7 @@ use std::ops::RangeInclusive;
 use std::str::FromStr;
 use utils::execution::execute_struct;
 use utils::input_read::read_parsed;
+use utils::parsing::parse_raw_range;
 
 #[derive(Debug)]
 struct MalformedTarget;
@@ -27,25 +28,6 @@ struct Target {
     y_range: RangeInclusive<isize>,
 }
 
-fn parse_raw_range(raw: &str) -> Result<RangeInclusive<isize>, MalformedTarget> {
-    let mut bounds = raw.split('=');
-    let _axis = bounds.next().ok_or(MalformedTarget)?;
-    let mut values = bounds.next().ok_or(MalformedTarget)?.split("..");
-
-    let lower_bound = values
-        .next()
-        .ok_or(MalformedTarget)?
-        .parse()
-        .map_err(|_| MalformedTarget)?;
-    let upper_bound = values
-        .next()
-        .ok_or(MalformedTarget)?
-        .parse()
-        .map_err(|_| MalformedTarget)?;
-
-    Ok(RangeInclusive::new(lower_bound, upper_bound))
-}
-
 impl FromStr for Target {
     type Err = MalformedTarget;
 
@@ -53,8 +35,10 @@ impl FromStr for Target {
         let stripped = s.strip_prefix("target area: ").ok_or(MalformedTarget)?;
         let mut ranges = stripped.split(", ");
 
-        let x_range = parse_raw_range(ranges.next().ok_or(MalformedTarget)?)?;
-        let y_range = parse_raw_range(ranges.next().ok_or(MalformedTarget)?)?;
+        let x_range =
+            parse_raw_range(ranges.next().ok_or(MalformedTarget)?).map_err(|_| MalformedTarget)?;
+        let y_range =
+            parse_raw_range(ranges.next().ok_or(MalformedTarget)?).map_err(|_| MalformedTarget)?;
 
         Ok(Target { x_range, y_range })
     }
