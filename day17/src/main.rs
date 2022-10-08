@@ -79,7 +79,7 @@ impl Target {
         // y' = Vy_0 + 1/2 - t; y' = 0 <=> t = Vy0 + 1/2, so probe will reach its max attitude at t = Vy0 + 1/2
         // therefore we have to consider t = Vy0 and t = Vy0 + 1
 
-        let vy_0 = (*self.y_range.start() + 1).abs() as usize;
+        let vy_0 = (*self.y_range.start() + 1).unsigned_abs();
         let y = |t: usize| vy_0 * t - t * t / 2 + t / 2;
 
         let t1 = vy_0;

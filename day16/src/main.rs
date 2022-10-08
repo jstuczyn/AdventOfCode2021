@@ -205,15 +205,9 @@ impl Packet {
             Type::Min => self.content.compute(|vals| *vals.iter().min().unwrap()),
             Type::Max => self.content.compute(|vals| *vals.iter().max().unwrap()),
             Type::Literal => self.content.compute(|_| Default::default()),
-            Type::GreaterThan => self
-                .content
-                .compute(|vals| if vals[0] > vals[1] { 1 } else { 0 }),
-            Type::LessThan => self
-                .content
-                .compute(|vals| if vals[0] < vals[1] { 1 } else { 0 }),
-            Type::Equal => self
-                .content
-                .compute(|vals| if vals[0] == vals[1] { 1 } else { 0 }),
+            Type::GreaterThan => self.content.compute(|vals| usize::from(vals[0] > vals[1])),
+            Type::LessThan => self.content.compute(|vals| usize::from(vals[0] < vals[1])),
+            Type::Equal => self.content.compute(|vals| usize::from(vals[0] == vals[1])),
         }
     }
 }

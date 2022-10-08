@@ -17,7 +17,7 @@ use utils::execute_slice;
 use utils::input_read::read_parsed_comma_separated_values;
 
 fn abs_diff(a: usize, b: usize) -> usize {
-    (a as isize - b as isize).abs() as usize
+    (a as isize - b as isize).unsigned_abs()
 }
 
 fn part1(input: &[usize]) -> usize {
