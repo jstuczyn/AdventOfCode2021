@@ -62,10 +62,7 @@ fn sieve(mut input: Vec<u16>, num_bits: u8, most_common: bool) -> u16 {
             target_bit = !target_bit & 1;
         }
 
-        input = input
-            .into_iter()
-            .filter(|x| (x >> bit & 1) as u8 == target_bit)
-            .collect()
+        input.retain(|x| (x >> bit & 1) as u8 == target_bit)
     }
 
     if input.len() > 1 {
