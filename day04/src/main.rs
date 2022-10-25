@@ -81,7 +81,7 @@ impl Display for BingoBoard {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         for row in &self.rows {
             for value in row {
-                write!(f, "{}", value)?
+                write!(f, "{value}")?
             }
             writeln!(f)?
         }

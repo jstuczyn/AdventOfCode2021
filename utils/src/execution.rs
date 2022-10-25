@@ -54,7 +54,7 @@ where
     let (part1_result, part1_time_taken) = execute_slice_with_timing(part1_fn, &input);
     let (part2_result, part2_time_taken) = execute_slice_with_timing(part2_fn, &input);
 
-    println!("It took {:?} to parse the input", parsing_time_taken);
+    println!("It took {parsing_time_taken:?} to parse the input");
     println!();
     println!(
         "Part 1 result is {}\nIt took {:?} to compute",
@@ -84,7 +84,7 @@ where
     let (part1_result, part1_time_taken) = execute_struct_with_timing(part1_fn, input.clone());
     let (part2_result, part2_time_taken) = execute_struct_with_timing(part2_fn, input);
 
-    println!("It took {:?} to parse the input", parsing_time_taken);
+    println!("It took {parsing_time_taken:?} to parse the input");
     println!();
     println!(
         "Part 1 result is {}\nIt took {:?} to compute",

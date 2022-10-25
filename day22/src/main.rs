@@ -82,7 +82,7 @@ impl Display for Cuboid {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let cubes = self.clone().into_cubes();
         for cube in cubes {
-            writeln!(f, "{}", cube)?;
+            writeln!(f, "{cube}")?;
         }
 
         Ok(())
