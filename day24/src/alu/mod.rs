@@ -87,6 +87,10 @@ impl Alu {
         }
     }
 
+    fn verify_input_len(&self, instructions: &[Instruction]) -> bool {
+        self.input.len() == instructions.iter().filter(|ins| ins.is_input()).count()
+    }
+
     pub(crate) fn execute_program(&mut self, instructions: &[Instruction]) {
         for instruction in instructions {
             self.execute_instruction(*instruction)

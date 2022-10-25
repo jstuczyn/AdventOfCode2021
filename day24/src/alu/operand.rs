@@ -55,6 +55,15 @@ pub(crate) enum Operand {
     Number(isize),
 }
 
+impl Operand {
+    pub(crate) fn get_number(&self) -> Option<isize> {
+        match self {
+            Operand::Var(_) => None,
+            Operand::Number(val) => Some(*val),
+        }
+    }
+}
+
 impl Display for Operand {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {

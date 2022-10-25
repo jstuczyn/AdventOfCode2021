@@ -34,6 +34,12 @@ pub(crate) enum Instruction {
     Equal(Variable, Operand),
 }
 
+impl Instruction {
+    pub(crate) fn is_input(&self) -> bool {
+        matches!(self, Instruction::Input(_))
+    }
+}
+
 impl FromStr for Instruction {
     type Err = anyhow::Error;
 
