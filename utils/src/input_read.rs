@@ -53,7 +53,7 @@ where
         .map_err(|err| {
             io::Error::new(
                 io::ErrorKind::InvalidData,
-                format!("input could not be parsed into desired type - {:?}", err),
+                format!("input could not be parsed into desired type - {err:?}"),
             )
         })
 }
@@ -83,7 +83,7 @@ where
         .map_err(|err| {
             io::Error::new(
                 io::ErrorKind::InvalidData,
-                format!("input could not be parsed into desired type - {:?}", err),
+                format!("input could not be parsed into desired type - {err:?}"),
             )
         })
 }
@@ -97,7 +97,7 @@ where
     fs::read_to_string(path).map(|s| s.parse())?.map_err(|err| {
         io::Error::new(
             io::ErrorKind::InvalidData,
-            format!("input could not be parsed into desired type - {:?}", err),
+            format!("input could not be parsed into desired type - {err:?}"),
         )
     })
 }

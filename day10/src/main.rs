@@ -67,7 +67,7 @@ impl From<char> for Bracket {
             '}' => Bracket::new(BracketType::Curly, false),
             '<' => Bracket::new(BracketType::Angle, true),
             '>' => Bracket::new(BracketType::Angle, false),
-            n => panic!("invalid bracket type found - {}", n),
+            n => panic!("invalid bracket type found - {n}"),
         }
     }
 }
