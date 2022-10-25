@@ -72,12 +72,12 @@ impl FromStr for Instruction {
 impl Display for Instruction {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            Instruction::Input(op1) => write!(f, "{} {}", INPUT, op1),
-            Instruction::Add(op1, op2) => write!(f, "{} {} {}", ADD, op1, op2),
-            Instruction::Mul(op1, op2) => write!(f, "{} {} {}", MUL, op1, op2),
-            Instruction::Div(op1, op2) => write!(f, "{} {} {}", DIV, op1, op2),
-            Instruction::Mod(op1, op2) => write!(f, "{} {} {}", MOD, op1, op2),
-            Instruction::Equal(op1, op2) => write!(f, "{} {} {}", EQUAL, op1, op2),
+            Instruction::Input(op1) => write!(f, "{INPUT} {op1}"),
+            Instruction::Add(op1, op2) => write!(f, "{ADD} {op1} {op2}"),
+            Instruction::Mul(op1, op2) => write!(f, "{MUL} {op1} {op2}"),
+            Instruction::Div(op1, op2) => write!(f, "{DIV} {op1} {op2}"),
+            Instruction::Mod(op1, op2) => write!(f, "{MOD} {op1} {op2}"),
+            Instruction::Equal(op1, op2) => write!(f, "{EQUAL} {op1} {op2}"),
         }
     }
 }
