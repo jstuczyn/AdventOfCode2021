@@ -283,18 +283,6 @@ impl Scanner {
         count
     }
 
-    #[cfg(test)]
-    fn overlapping_beacons(&self, other: &Self) -> Vec<Position> {
-        let mut overlap = Vec::new();
-        for other_beacon in &other.beacons {
-            if self.beacons.contains(other_beacon) {
-                overlap.push(*other_beacon)
-            }
-        }
-
-        overlap
-    }
-
     // we treat 'self' as the source of truth
     fn try_align_scanner(&self, other: &Self) -> Option<Scanner> {
         for &base in &self.beacons {
@@ -638,31 +626,6 @@ mod tests {
         };
 
         vec![scanner0, scanner1, scanner2, scanner3, scanner4]
-    }
-
-    #[test]
-    fn overlap_example() {
-        let example_scanners = example_scanners();
-        let scanner0 = &example_scanners[0];
-        let scanner1 = &example_scanners[1];
-
-        let expected: Vec<Position> = vec![
-            (-618, -824, -621).into(),
-            (-537, -823, -458).into(),
-            (-447, -329, 318).into(),
-            (404, -588, -901).into(),
-            (544, -627, -890).into(),
-            (528, -643, 409).into(),
-            (-661, -816, -575).into(),
-            (390, -675, -793).into(),
-            (423, -701, 434).into(),
-            (-345, -311, 381).into(),
-            (459, -707, 401).into(),
-            (-485, -357, 347).into(),
-        ];
-
-        let aligned = scanner0.try_align_scanner(scanner1).unwrap();
-        assert_eq!(expected, scanner0.overlapping_beacons(&aligned))
     }
 
     #[test]
